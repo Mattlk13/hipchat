@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "description": "HipChat compatibility layer for atlassian-connect-express (ACE)",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "request": "~2.16.6",
+    "underscore": "~1.4.4",
+    "rsvp": "~2.0.1",
+    "jwt-simple": "~0.1.0"
   },
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/hipchat/atlassian-connect-express-hipchat"
   },
   "keywords": [
-    "atlassian",
     "atlassian",
     "connect",
     "express",
