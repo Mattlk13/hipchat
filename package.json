@@ -1,0 +1,22 @@
+{
+  "name": "atlassian-connect-express-hipchat",
+  "version": "0.1.0",
+  "description": "HipChat compatibility layer for atlassian-connect-express (ACE)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/hipchat/atlassian-connect-express-hipchat"
+  },
+  "keywords": [
+    "atlassian",
+    "atlassian",
+    "connect",
+    "express",
+    "hipchat"
+  ],
+  "author": "Rich Manalang",
+  "license": "Apache 2.0"
+}
