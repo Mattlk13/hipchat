@@ -13,7 +13,7 @@ function HipChat(addon, app){
     addon.loadClientInfo = self.loadClientInfo;
     addon.authenticate = self.authenticate;
     addon._configure = self._configure;
-    addon._getAccessToken = self._getAccessToken;
+    addon.getAccessToken = self.getAccessToken;
 
     // Disable auto-registration... not necessary with HipChat
     addon.register = function(){
@@ -28,7 +28,7 @@ function HipChat(addon, app){
 
 var proto = HipChat.prototype = Object.create(EventEmitter.prototype);
 
-proto._getAccessToken = function(clientInfo, scopes) {
+proto.getAccessToken = function(clientInfo, scopes) {
     var self = this;
     function generateAccessToken(scopes){
         return new RSVP.Promise(function(resolve, reject){
@@ -140,12 +140,12 @@ proto._configure = function(){
                                 capabilitiesUrl: req.body.capabilitiesUrl,
                                 capabilitiesDoc: hcCapabilities
                             };
-                            self._getAccessToken(clientInfo)
+                            self.getAccessToken(clientInfo)
                                 .then(function(tokenObj){
                                     clientInfo.groupId = tokenObj.group_id;
                                     clientInfo.groupName = tokenObj.group_name;
-                                    self.emit('installed', clientInfo.clientKey, clientInfo, req.body);
-                                    self.emit('plugin_enabled', clientInfo.clientKey, clientInfo);
+                                    self.emit('installed', clientInfo.clientKey, clientInfo, req);
+                                    self.emit('plugin_enabled', clientInfo.clientKey, clientInfo, req);
                                     self.settings.set('clientInfo', clientInfo, clientInfo.clientKey).then(function (data) {
                                         self.logger.info("Saved tenant details for " + settings.clientKey + " to database\n" + util.inspect(data));
                                         self.emit('host_settings_saved', settings.clientKey, data);
