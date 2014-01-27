@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
-var _ = require('underscore');
+var _ = require('lodash');
 var http = require('request');
 var RSVP = require('rsvp');
 var jwt = require('jwt-simple');
@@ -184,31 +184,113 @@ proto._configure = function(){
     );
 }
 
+proto.middleware = function(){
+
+    var addon = this;
+    return function(req, res, next){
+        var hostUrl = req.param('xdmhost');
+        var params;
+
+        if (hostUrl) {
+            params = {
+                hostBaseUrl: hostUrl
+            };
+            _.extend(req.session, params);
+        } else {
+            params = req.session;
+        }
+
+        augmentRequest(params, req, res, next);
+
+    }
+
+    function augmentRequest(params, req, res, next) {
+        if (params && params.hostBaseUrl) {
+            res.locals = _.extend({}, res.locals || {}, params, {
+                title: addon.config.name,
+                appKey: addon.config.key,
+                localBaseUrl: addon.config.localBaseUrl(),
+                hostStylesheetUrl: hostResourceUrl(addon.app, params.hostBaseUrl, 'css'),
+                hostScriptUrl: hostResourceUrl(addon.app, params.hostBaseUrl, 'js')
+            });
+        }
+
+        next();
+    }
+
+    function hostResourceUrl(app, baseUrl, type) {
+        var suffix = app.get('env') === 'development' ? '-debug' : '';
+        return baseUrl + '/atlassian-connect/all' + suffix + '.' + type;
+    }
+}
+
 // Middleware to verify jwt token
 proto.authenticate = function(){
     var self = this;
+
     return function(req, res, next){
         function send(code, msg) {
             self.logger.error('JWT verification error:', code, msg);
             res.send(code, msg);
         }
 
-        if (req.query.signed_request) {
+        function success(jwtToken, clientInfo) {
+            if (jwtToken && jwtToken.iss && req.session) {
+                req.session.clientKey = jwtToken.iss;
+            }
+
+            // Refresh the JWT token
+            var now = Math.floor(Date.now()/1000);
+            jwtToken.iat = now
+            // Default maxTokenAge is 15m
+            jwtToken.exp = now + (self.config.maxTokenAge() / 1000);
+            res.locals.signed_request = jwt.encode(jwtToken, clientInfo.oauthSecret);
+
+            req.context = jwtToken.context;
+            req.clientInfo = clientInfo;
+            next();
+        }
+
+        var signedRequest = req.query.signed_request || req.headers['X-acpt'];
+        if (signedRequest) {
             try {
                 // First get the oauthId from the JWT context by decoding it without verifying
-                var clientId = jwt.decode(req.query.signed_request, null, true).iss;
+                var unverifiedClaims = jwt.decode(signedRequest, null, true);
+
+                var issuer = unverifiedClaims.iss;
+                if (!issuer) {
+                    send('JWT claim did not contain the issuer (iss) claim');
+                    return;
+                }
 
                 // Then, let's look up the client's oauthSecret so we can verify the request
-                self.loadClientInfo(clientId).then(function(clientInfo){
+                self.loadClientInfo(issuer).then(function(clientInfo){
                     // verify the signed request
                     if (clientInfo === null) {
                         return send(400, "Request can't be verified without an OAuth secret");
                     }
-                    var request = jwt.decode(req.query.signed_request, clientInfo.oauthSecret);
-                    req.context = request.context;
-                    req.clientInfo = clientInfo;
-                    console.log(req.context);
-                    next();
+                    var verifiedClaims = jwt.decode(signedRequest, clientInfo.oauthSecret);
+
+                    // JWT expiry can be overriden using the `validityInMinutes` config.
+                    // If not set, will use `exp` provided by HC server (default is 1 hour)
+                    var now = Math.floor(Date.now()/1000);;
+                    if (self.config.maxTokenAge()) {
+                        var issuedAt = verifiedClaims.iat;
+                        var expiresInSecs = self.config.maxTokenAge() / 1000;
+                        if(issuedAt && now >= (issuedAt + expiresInSecs)){
+                            send(401, 'Authentication request has expired.');
+                            return;
+                        }
+
+                    } else {
+                        var expiry = verifiedClaims.exp;
+                        if (expiry && now >= expiry) { // default is 1 hour
+                            send(401, 'Authentication request has expired.');
+                            return;
+                        }
+                    }
+
+                    success(verifiedClaims, clientInfo);
                 }, function(err) {
                     return send(400, err.message);
                 });
