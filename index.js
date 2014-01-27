@@ -10,6 +10,7 @@ function HipChat(addon, app){
 
     // override the following...
     addon.middleware = self.middleware;
+    addon.loadClientInfo = self.loadClientInfo;
     addon.authenticate = self.authenticate;
     addon._configure = self._configure;
     addon._getAccessToken = self._getAccessToken;
@@ -223,6 +224,17 @@ proto.middleware = function(){
         return baseUrl + '/atlassian-connect/all' + suffix + '.' + type;
     }
 }
+
+proto.loadClientInfo = function(clientKey) {
+    var self = this;
+    return new RSVP.Promise(function(resolve, reject){
+        self.settings.get('clientInfo', clientKey).then(function(d){
+            resolve(d);
+        }, function(err) {
+            reject(err);
+        });
+    });
+};
 
 // Middleware to verify jwt token
 proto.authenticate = function(){
