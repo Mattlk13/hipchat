@@ -257,6 +257,7 @@ proto.authenticate = function(){
             // Default maxTokenAge is 15m
             jwtToken.exp = now + (self.config.maxTokenAge() / 1000);
             res.locals.signed_request = jwt.encode(jwtToken, clientInfo.oauthSecret);
+            res.set('x-acpt', res.locals.signed_request);
 
             req.context = jwtToken.context;
             req.clientInfo = clientInfo;
