@@ -264,7 +264,7 @@ proto.authenticate = function(){
             next();
         }
 
-        var signedRequest = req.query.signed_request || req.headers['X-acpt'];
+        var signedRequest = req.query.signed_request || req.headers['x-acpt'];
         if (signedRequest) {
             try {
                 // First get the oauthId from the JWT context by decoding it without verifying
