@@ -77,9 +77,9 @@ proto.getAccessToken = function(clientInfo, scopes) {
         self.settings.get(scopeKey, clientInfo.clientKey).then(function(token){
             if (token) {
                 if (token.expires_in + token.created < (new Date().getTime() / 1000)) {
-                    resolve(token);
-                } else {
                     generate();
+                } else {
+                    resolve(token);
                 }
             } else {
                 generate();
