@@ -4,6 +4,7 @@ var http = require('request');
 var RSVP = require('rsvp');
 var jwt = require('jwt-simple');
 var urls = require('url');
+var util = require('util');
 
 function HipChat(addon, app){
     var self = this;
@@ -140,20 +141,20 @@ proto._configure = function(){
                                 capabilitiesUrl: req.body.capabilitiesUrl,
                                 capabilitiesDoc: hcCapabilities
                             };
+                            var clientKey = clientInfo.clientKey;
                             self.getAccessToken(clientInfo)
                                 .then(function(tokenObj){
                                     clientInfo.groupId = tokenObj.group_id;
                                     clientInfo.groupName = tokenObj.group_name;
-                                    self.emit('installed', clientInfo.clientKey, clientInfo, req);
-                                    self.emit('plugin_enabled', clientInfo.clientKey, clientInfo, req);
-                                    self.settings.set('clientInfo', clientInfo, clientInfo.clientKey).then(function (data) {
-                                        self.logger.info("Saved tenant details for " + settings.clientKey + " to database\n" + util.inspect(data));
-                                        self.emit('host_settings_saved', settings.clientKey, data);
+                                    self.emit('installed', clientKey, clientInfo, req);
+                                    self.emit('plugin_enabled', clientKey, clientInfo, req);
+                                    self.settings.set('clientInfo', clientInfo, clientKey).then(function (data) {
+                                        self.logger.info("Saved tenant details for " + clientKey + " to database\n" + util.inspect(data));
+                                        self.emit('host_settings_saved', clientKey, data);
                                         res.send(204);
                                     }, function (err) {
-                                        res.send(500, 'Could not lookup stored client data for ' + settings.clientKey + ': ' + err);
+                                        res.send(500, 'Could not lookup stored client data for ' + clientKey + ': ' + err);
                                     });
-                                    res.send(204);
                                 })
                                 .then(null, function(err){
                                     res.send(500, err);
