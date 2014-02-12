@@ -228,7 +228,11 @@ To make things easier, we've provided a simple HipChat client for sending messag
 
 ### How to persist data for your add-on
 
-`atlassian-connect-express-hipchat` bundles a [Redis](http://redis.io/) [adapter](https://bitbucket.org/rmanalan/atlassian-connect-express-redis). You don't have to use Redis, but the default template makes use of Redis. Redis is awesome for building add-ons, but you're free to use whatever you'd like. We also bundle [JugglingDB](http://jugglingdb.co/) (a cross-database ORM for nodejs) which works with a variety of databases.
+`atlassian-connect-express-hipchat` bundles a [Redis](http://redis.io/) [adapter](https://bitbucket.org/atlassianlabs/atlassian-connect-express-redis). *To use Redis with your add-on, you should install Redis locally.*
+
+You don't have to use Redis, but the default template makes use of Redis. Redis is awesome for building add-ons, but you're free to use whatever you'd like. We also bundle [JugglingDB](http://jugglingdb.co/) (a cross-database ORM for nodejs) which works with a variety of databases.
+
+If you choose to use Redis, congratulations on *doing the right thing*. But more importantly, you might also want to use [redis-commander](https://github.com/joeferner/redis-commander) to manage your Redis data. It's extremely helpful to see what's getting stored in your DB.
 
 ### How to deploy to Heroku
 Before you start, install Git and the [Heroku Toolbelt](https://toolbelt.heroku.com/).
