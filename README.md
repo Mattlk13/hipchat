@@ -117,7 +117,7 @@ To see all of the available settings in the `atlassian-connect.json`, take a loo
 ## Sample Add-ons using `atlassian-connect-express-hipchat`
 
 * [GitHub](https://bitbucket.org/hipchat/hipchat-github-addon) -- get notified of events that happen on GitHub inside your HipChat rooms
-* *More coming soon*
+* [Instagram](https://bitbucket.org/hipchat/hipchat-instagram-addon) -- get room notifications when someone posts a photo matching a tag you're watching
 
 ## The `atlassian-connect-express-hipchat` scaffold
 
