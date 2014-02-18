@@ -139,7 +139,8 @@ proto._configure = function(){
                                 clientKey: req.body.oauthId,
                                 oauthSecret: req.body.oauthSecret,
                                 capabilitiesUrl: req.body.capabilitiesUrl,
-                                capabilitiesDoc: hcCapabilities
+                                capabilitiesDoc: hcCapabilities,
+                                roomId: req.body.roomId
                             };
                             var clientKey = clientInfo.clientKey;
                             self.getAccessToken(clientInfo)
