@@ -118,6 +118,7 @@ To see all of the available settings in the `atlassian-connect.json`, take a loo
 
 * [GitHub](https://bitbucket.org/hipchat/hipchat-github-addon) -- get notified of events that happen on GitHub inside your HipChat rooms
 * [Instagram](https://bitbucket.org/hipchat/hipchat-instagram-addon) -- get room notifications when someone posts a photo matching a tag you're watching
+* [Chatty](https://bitbucket.org/hipchat/chatty) -- Chatty is a HipChat add-on that aims to replace [hubot-hipchat](https://github.com/hipchat/hubot-hipchat). Since the `hubot-hipchat` adapter has proven difficult to maintain and set up, this attempts to provide much of the same functionality using HipChat's add-on system.
 
 ## The `atlassian-connect-express-hipchat` scaffold
 
