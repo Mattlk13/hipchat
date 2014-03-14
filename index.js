@@ -15,6 +15,10 @@ function HipChat(addon, app){
     addon.authenticate = self.authenticate;
     addon._configure = self._configure;
     addon.getAccessToken = self.getAccessToken;
+    // temporarily support both capabilities and modules
+    if (addon.descriptor.modules) {
+        addon.descriptor.capabilities = addon.descriptor.modules;
+    }
 
     // Disable auto-registration... not necessary with HipChat
     addon.register = function(){
