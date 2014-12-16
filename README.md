@@ -86,11 +86,11 @@ To register your add-on descriptor, navigate to the rooms administration page:
 
     https://<your-account>.hipchat.com/rooms
 
-Then select one of your rooms in the list. In the following page, select `Add-ons` in the sidebar:
+Then select one of your rooms in the list. In the following page, select `Integrations` in the sidebar:
 
-![Add-on administration](http://f.cl.ly/items/1w2S2z2c3g0k031x3S1d/HipChat%20-%20HipChat%20Add-ons%202014-02-11%2010-32-48.png)
+Below the page, you'll find the **Build and install your own integration** link. Click the link and Paste your descriptor URL in the **Integration URL** field then **Add integration**. This will initiate the installation of your add-on inside the room.
 
-Below the page, you'll find the **Create new private add-ons** form. Paste your descriptor URL in the **Capabilities URL** field then save. This will initiate the installation of your add-on inside the room.
+![Add-on administration](http://f.cl.ly/items/161f2L2h45430D2B0v29/Screen_Shot_2014-12-15_at_12_33_38_pm.png)
 
 ### Configuration
 
