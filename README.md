@@ -86,11 +86,11 @@ To register your add-on descriptor, navigate to the rooms administration page:
 
     https://<your-account>.hipchat.com/rooms
 
-Then select one of your rooms in the list. In the following page, select `Integrations` in the sidebar:
+Then select one of your rooms in the list. In the following page, select **Integrations** in the sidebar:
 
-Below the page, you'll find the **Build and install your own integration** link. Click the link and Paste your descriptor URL in the **Integration URL** field then **Add integration**. This will initiate the installation of your add-on inside the room.
+Below the page, you'll find the **Install an integration from a descriptor URL** link. Click the link and Paste your descriptor URL in the **Integration URL** field then **Add integration**. This will initiate the installation of your add-on inside the room.
 
-![Add-on administration](http://f.cl.ly/items/161f2L2h45430D2B0v29/Screen_Shot_2014-12-15_at_12_33_38_pm.png)
+![Add-on administration](https://s3.amazonaws.com/f.cl.ly/items/2c0j1b282J0N2l2b0237/Screen_Shot_2015-03-08_at_9_06_53_am.png)
 
 ### Configuration
 
@@ -167,10 +167,10 @@ Add-ons are authenticated through [JWT](http://tools.ietf.org/html/draft-ietf-oa
         );
     };
 
-Simply adding the `addon.authenticate()` middleware will protect your resource. It will also make available some useful `request` properties that will be useful in your app:
+Adding the `addon.authenticate()` middleware will protect your resource. It will also make available some useful `request` properties:
 
-* `req.clientInfo`: useful information about the add-on client such as the clientKey, oauth info, and HipChat account info
-* `req.context`: contains the context data accompanying the request like the roomId
+* `req.clientInfo`: Information about the add-on client such as the clientKey, oauth info, and HipChat account info
+* `req.context`: Context data accompanying the request like the roomId
 
 It also populates the `res.signed_request` property that can be used to expose the JWT token to your pages for subsequent requests back to your add-on server.
 
@@ -208,7 +208,7 @@ You can embed the token anywhere in your iframe content using the `token` conten
 
 Both the query parameter `acpt` and the HTTP request header `X-acpt` are automatically recognized and handled by `atlassian-connect-express-hipchat` when a route is secured with the `addon.authenticate()` middleware. The token remains valid for 15 minutes by default, and is automatically refreshed on each call. The expiration of the token can be configured using `maxTokenAge` (in seconds) inside `config.json`.
 
-### How to send a signed outbound HTTP request back to the host
+### How to send a signed HTTP request from the add-on service back to HipChat
 
 `atlassian-connect-express-hipchat` bundles and extends the [request](https://github.com/mikeal/request) HTTP client. To make a request back to the HipChat, all you have to do is use `request` the way it was designed. REST calls back to HipChat require that you use the `access_token` provided to you at installation.
 
