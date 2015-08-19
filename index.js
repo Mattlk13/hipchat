@@ -277,7 +277,7 @@ proto.authenticate = function(){
             next();
         }
 
-        var signedRequest = req.query.signed_request || req.headers['x-acpt'] || req.headers.authorization;
+        var signedRequest = req.query.signed_request || req.headers['x-acpt'] || _.get(/JWT\s+(.+)/.exec(req.headers.authorization), 1, null);
         if (signedRequest) {
             try {
                 // First get the oauthId from the JWT context by decoding it without verifying
@@ -299,7 +299,7 @@ proto.authenticate = function(){
 
                     // JWT expiry can be overriden using the `validityInMinutes` config.
                     // If not set, will use `exp` provided by HC server (default is 1 hour)
-                    var now = Math.floor(Date.now()/1000);;
+                    var now = Math.floor(Date.now()/1000);
                     if (self.config.maxTokenAge()) {
                         var issuedAt = verifiedClaims.iat;
                         var expiresInSecs = self.config.maxTokenAge() / 1000;
