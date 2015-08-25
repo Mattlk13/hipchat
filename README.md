@@ -194,17 +194,17 @@ A route can be secured by adding the `addon.authenticate()` middleware:
 
 In order to secure your route, the token must be part of the HTTP request back to the add-on service. This can be done by using a query parameter:
 
-    <a href="/protected-resource?signed_request={{token}}">See more</a>
+    <a href="/protected-resource?signed_request={{signed_request}}">See more</a>
 
 The second option is to use an HTTP header, e.g. for AJAX requests:
 
     beforeSend: function (request) {
-        request.setRequestHeader("X-acpt", {{token}});
+        request.setRequestHeader("X-acpt", {{signed_request}});
     }
 
-You can embed the token anywhere in your iframe content using the `token` content variable. For example, you can embed it in a meta tag, from where it can later be read by a script:
+You can embed the token anywhere in your iframe content using the `signed_request` content variable. For example, you can embed it in a meta tag, from where it can later be read by a script:
 
-    <meta name="acpt" content="{{token}}">
+    <meta name="acpt" content="{{signed_request}}">
 
 Both the query parameter `acpt` and the HTTP request header `X-acpt` are automatically recognized and handled by `atlassian-connect-express-hipchat` when a route is secured with the `addon.authenticate()` middleware. The token remains valid for 15 minutes by default, and is automatically refreshed on each call. The expiration of the token can be configured using `maxTokenAge` (in seconds) inside `config.json`.
 
