@@ -229,7 +229,7 @@ proto.middleware = function(){
         var suffix = app.get('env') === 'development' ? '-debug' : '';
         return baseUrl + '/atlassian-connect/all' + suffix + '.' + type;
     }
-}
+};
 
 proto.loadClientInfo = function(clientKey) {
     var self = this;
@@ -259,7 +259,7 @@ proto.authenticate = function(){
 
             // Refresh the JWT token
             var now = Math.floor(Date.now()/1000);
-            jwtToken.iat = now
+            jwtToken.iat = now;
             // Default maxTokenAge is 15m
             jwtToken.exp = now + (self.config.maxTokenAge() / 1000);
             res.locals.signed_request = jwt.encode(jwtToken, clientInfo.oauthSecret);
@@ -267,10 +267,18 @@ proto.authenticate = function(){
 
             req.context = jwtToken.context;
             req.clientInfo = clientInfo;
+
+            req.identity = _.assign({}, {
+                groupId: clientInfo.groupId,
+                roomId: req.context.room_id,
+                userId: jwtToken.sub
+            });
+
             next();
         }
 
-        var signedRequest = req.query.signed_request || req.headers['x-acpt'];
+        var authHeader = req.headers.authorization || "";
+        var signedRequest = req.query.signed_request || req.headers['x-acpt'] || _.get(authHeader.match(/JWT\s(.+)/), '1', null);
         if (signedRequest) {
             try {
                 // First get the oauthId from the JWT context by decoding it without verifying
@@ -292,7 +300,7 @@ proto.authenticate = function(){
 
                     // JWT expiry can be overriden using the `validityInMinutes` config.
                     // If not set, will use `exp` provided by HC server (default is 1 hour)
-                    var now = Math.floor(Date.now()/1000);;
+                    var now = Math.floor(Date.now()/1000);
                     if (self.config.maxTokenAge()) {
                         var issuedAt = verifiedClaims.iat;
                         var expiresInSecs = self.config.maxTokenAge() / 1000;
