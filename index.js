@@ -270,7 +270,7 @@ proto.authenticate = function(){
 
             req.identity = _.assign({}, {
                 groupId: clientInfo.groupId,
-                roomId: clientInfo.roomId,
+                roomId: req.context.room_id,
                 userId: jwtToken.sub
             });
 
@@ -278,7 +278,7 @@ proto.authenticate = function(){
         }
 
         var jwtHeader = req.headers.authorization || "";
-        var signedRequest = req.query.signed_request || req.headers['x-acpt'] || _.get(jwtHeader.match(/JWT\s+(.+)/), '1', null);
+        var signedRequest = req.query.signed_request || req.headers['x-acpt'] || _.get(jwtHeader.match(/JWT\s(.+)/), '1', null);
         if (signedRequest) {
             try {
                 // First get the oauthId from the JWT context by decoding it without verifying
