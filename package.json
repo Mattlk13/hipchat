@@ -1,6 +1,6 @@
 {
   "name": "atlassian-connect-express-hipchat",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "HipChat compatibility layer for atlassian-connect-express (ACE)",
   "main": "index.js",
   "dependencies": {
