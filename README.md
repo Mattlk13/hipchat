@@ -171,6 +171,7 @@ Adding the `addon.authenticate()` middleware will protect your resource. It will
 
 * `req.clientInfo`: Information about the add-on client such as the clientKey, oauth info, and HipChat account info
 * `req.context`: Context data accompanying the request like the roomId
+* `req.identity`: Information about the user such as the userId and groupId
 
 It also populates the `res.signed_request` property that can be used to expose the JWT token to your pages for subsequent requests back to your add-on server.
 
