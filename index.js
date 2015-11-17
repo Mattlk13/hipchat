@@ -108,8 +108,8 @@ proto._configure = function(){
     function verifyInstallation(url){
         return new RSVP.Promise(function(resolve, reject){
             http.get(url, function(err, res, body){
-                var data = JSON.parse(body);
                 if(!err){
+                    var data = JSON.parse(body);
                     if(data.links.self === url){
                         resolve(data);
                     } else {
