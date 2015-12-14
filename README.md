@@ -40,13 +40,20 @@ This creates a new project home directory with the following contents:
     ├── public
     │   ├── css
     │   │   └── addon.css
+    │   ├── img
+    │   │   └── logo.png
     │   └── js
-    │       └── addon.js
+    │       ├── addon.js
+    │       └── iframe.min.js
     ├── routes
     │   └── index.js
     └── views
         ├── config.hbs
-        └── layout.hbs
+        ├── dialog.hbs
+        ├── layout.hbs
+        └── sidebar.hbs
+    
+    7 directories, 16 files    
 
 ### Install dependencies
 
@@ -58,11 +65,11 @@ Change to the new project directory and install dependencies:
 
 The development workflow for building HipChat add-ons is rad. You can build your add-on locally while running it inside of <https://hipchat.com>. To do this, you'll need to expose your local webserver to the internet. An easy way to do this is to use a [local tunnel](http://en.wikipedia.org/wiki/Tunneling_protocol). We highly recommend using [ngrok](https://ngrok.com/). `ngrok` is a simple client tool that allows you to forward internet requests on an ngrok subdomain to your local server:
 
-    ngrok -subdomain <subdomain-name> <port>
+    ngrok http <-subdomain=[subdomain (paid accts only)]> <port>
 
 ### Running your Add-on Server
 
-Once you've started your tunnel, you can run your add-on server:
+Once you've started your tunnel, you can run your add-on server (grab the ngrok HTTPs url and use that here):
 
     AC_LOCAL_BASE_URL=https://<subdomain>.ngrok.com node app.js
 
@@ -72,7 +79,7 @@ This will boot up your add-on server on the default port of 3000. The `AC_LOCAL_
 
 At this point, you can start building your add-on. Changes to views load automatically, however, if you make changes to any JavaScript, you need to restart your add-on server. If you want your server to automatically restart when your JavaScript changes, consider using [nodemon](https://npmjs.org/package/nodemon).
 
-    AC_LOCAL_BASE_URL=https://<subdomain>.ngrok.com nodemon app.js
+    AC_LOCAL_BASE_URL=https://<subdomain>.ngrok.com [node | nodemon] app.js
 
 ### Registering your Add-on with HipChat
 
