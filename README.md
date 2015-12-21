@@ -1,7 +1,5 @@
 # atlassian-connect-express-hipchat: Node.js module for Express based HipChat Connect Add-ons
 
-[![Build Status](https://drone.io/bitbucket.org/hipchat/atlassian-connect-express-hipchat/status.png)](https://drone.io/bitbucket.org/hipchat/atlassian-connect-express-hipchat/latest)
-
 `atlassian-connect-express-hipchat` is an NPM module for creating [HipChat Connect](https://www.hipchat.com/docs/apiv2/addons) Add-ons with [Node.js](http://nodejs.org/). HipChat Connect is a variant of [Atlassian Connect](https://developer.atlassian.com/static/connect/docs/) and `atlassian-connect-express-hipchat` is a HipChat compatibility layer on top of [atlassian-connect-express](https://bitbucket.org/atlassian/atlassian-connect-express) (aka, ACE).
 
 ## More about `atlassian-connect-express-hipchat`
