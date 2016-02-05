@@ -6,7 +6,7 @@ var jwt = require('jwt-simple');
 var urls = require('url');
 var util = require('util');
 
-function HipChat(addon, app){
+function HipChat(addon, app) {
     var self = this;
 
     // override the following...
@@ -21,11 +21,11 @@ function HipChat(addon, app){
     }
 
     // Disable auto-registration... not necessary with HipChat
-    addon.register = function(){
+    addon.register = function () {
         self.logger.info('Auto registration not available with HipChat add-ons')
     };
 
-    addon._verifyKeys = function(){};
+    addon._verifyKeys = function () { };
 
     // mixin the addon
     _.extend(self, addon);
@@ -33,29 +33,25 @@ function HipChat(addon, app){
 
 var proto = HipChat.prototype = Object.create(EventEmitter.prototype);
 
-proto.getAccessToken = function(clientInfo, scopes) {
+proto.getAccessToken = function (clientInfo, scopes) {
     var self = this;
-    function generateAccessToken(scopes){
-        return new RSVP.Promise(function(resolve, reject){
+    function generateAccessToken(scopes) {
+        return new RSVP.Promise(function (resolve, reject) {
             var tokenUrl = clientInfo.capabilitiesDoc.capabilities.oauth2Provider.tokenUrl;
             http.post(tokenUrl, {
                 form: {
                     'grant_type': 'client_credentials',
                     'scope': scopes.join(' ')
                 },
+                json: true,
                 auth: {
                     user: clientInfo.clientKey,
                     pass: clientInfo.oauthSecret
                 }
-            }, function(err, res, body){
-                if(!err) {
-                    try {
-                        var token = JSON.parse(body);
-                        token.created = new Date().getTime() / 1000;
-                        resolve(token);
-                    } catch(e) {
-                        reject(e);
-                    }
+            }, function (err, res, token) {
+                if (!err) {
+                    token.created = new Date().getTime() / 1000;
+                    resolve(token);
                 } else {
                     reject(err);
                 }
@@ -63,23 +59,23 @@ proto.getAccessToken = function(clientInfo, scopes) {
         });
     }
 
-    return new RSVP.Promise(function(resolve, reject){
+    return new RSVP.Promise(function (resolve, reject) {
         scopes = scopes || self.descriptor.capabilities.hipchatApiConsumer.scopes;
         var scopeKey = scopes.join("|");
 
         function generate() {
             generateAccessToken(scopes).then(
-                function(token) {
+                function (token) {
                     self.settings.set(scopeKey, token, clientInfo.clientKey);
                     resolve(token);
                 },
-                function(err) {
+                function (err) {
                     reject(err);
                 }
-            );
+                );
         }
 
-        self.settings.get(scopeKey, clientInfo.clientKey).then(function(token){
+        self.settings.get(scopeKey, clientInfo.clientKey).then(function (token) {
             if (token) {
                 if (token.expires_in + token.created < (new Date().getTime() / 1000)) {
                     generate();
@@ -89,13 +85,13 @@ proto.getAccessToken = function(clientInfo, scopes) {
             } else {
                 generate();
             }
-        }, function(err) {
+        }, function (err) {
             reject(err);
         });
     });
 };
 
-proto._configure = function(){
+proto._configure = function () {
     var self = this;
     var baseUrl = urls.parse(self.config.localBaseUrl());
     var basePath = baseUrl.path && baseUrl.path.length > 1 ? baseUrl.path : '';
@@ -105,12 +101,15 @@ proto._configure = function(){
     });
 
     // HC Connect install verification flow
-    function verifyInstallation(url){
-        return new RSVP.Promise(function(resolve, reject){
-            http.get(url, function(err, res, body){
-                if(!err){
-                    var data = JSON.parse(body);
-                    if(data.links.self === url){
+    function verifyInstallation(url) {
+        return new RSVP.Promise(function (resolve, reject) {
+            http({
+                method: 'GET',
+                url: url,
+                json: true
+            }, function (err, res, data) {
+                if (!err) {
+                    if (data.links.self === url) {
                         resolve(data);
                     } else {
                         reject("The capabilities URL " + url + " doesn't match the resource's self link " + data.links.self);
@@ -123,13 +122,13 @@ proto._configure = function(){
     };
 
     // register routes for installable handler
-    if (typeof self.descriptor.capabilities.installable != 'undefined') {
-        var callbackUrl = '/'+self.descriptor.capabilities.installable.callbackUrl.split('/').slice(3).join('/');
+    if (_.get(self.descriptor, 'capabilities.installable.callbackUrl', false)) {
+        var callbackUrl = '/' + self.descriptor.capabilities.installable.callbackUrl.split('/').slice(3).join('/');
 
         // Install handler
         self.app.post(
 
-            // mount path
+        // mount path
             callbackUrl,
 
             // TODO auth middleware
@@ -138,7 +137,7 @@ proto._configure = function(){
             function (req, res) {
                 try {
                     verifyInstallation(req.body.capabilitiesUrl)
-                        .then(function(hcCapabilities){
+                        .then(function (hcCapabilities) {
                             var clientInfo = {
                                 clientKey: req.body.oauthId,
                                 oauthSecret: req.body.oauthSecret,
@@ -148,7 +147,7 @@ proto._configure = function(){
                             };
                             var clientKey = clientInfo.clientKey;
                             self.getAccessToken(clientInfo)
-                                .then(function(tokenObj){
+                                .then(function (tokenObj) {
                                     clientInfo.groupId = tokenObj.group_id;
                                     clientInfo.groupName = tokenObj.group_name;
                                     self.emit('installed', clientKey, clientInfo, req);
@@ -161,26 +160,26 @@ proto._configure = function(){
                                         res.send(500, 'Could not lookup stored client data for ' + clientKey + ': ' + err);
                                     });
                                 })
-                                .then(null, function(err){
+                                .then(null, function (err) {
                                     res.send(500, err);
                                 });
                         })
-                        .then(null, function(err){
+                        .then(null, function (err) {
                             res.send(500, err);
                         }
-                    );
+                            );
                 } catch (e) {
                     res.send(500, e);
                 }
             }
-        );
+            );
     }
 
     // uninstall handler
     self.app.delete(
         callbackUrl + '/:oauthId',
         // verify request,
-        function(req, res){
+        function (req, res) {
             try {
                 self.emit('uninstalled', req.params.oauthId);
                 res.send(204);
@@ -188,14 +187,14 @@ proto._configure = function(){
                 res.send(500, e);
             }
         }
-    );
+        );
 }
 
-proto.middleware = function(){
+proto.middleware = function () {
 
     var addon = this;
-    return function(req, res, next){
-        var hostUrl = req.param('xdmhost');
+    return function (req, res, next) {
+        var hostUrl = req.params.xdmhost;
         var params;
 
         if (hostUrl) {
@@ -231,22 +230,22 @@ proto.middleware = function(){
     }
 };
 
-proto.loadClientInfo = function(clientKey) {
+proto.loadClientInfo = function (clientKey) {
     var self = this;
-    return new RSVP.Promise(function(resolve, reject){
-        self.settings.get('clientInfo', clientKey).then(function(d){
+    return new RSVP.Promise(function (resolve, reject) {
+        self.settings.get('clientInfo', clientKey).then(function (d) {
             resolve(d);
-        }, function(err) {
+        }, function (err) {
             reject(err);
         });
     });
 };
 
 // Middleware to verify jwt token
-proto.authenticate = function(){
+proto.authenticate = function () {
     var self = this;
 
-    return function(req, res, next){
+    return function (req, res, next) {
         function send(code, msg) {
             self.logger.error('JWT verification error:', code, msg);
             res.send(code, msg);
@@ -258,7 +257,7 @@ proto.authenticate = function(){
             }
 
             // Refresh the JWT token
-            var now = Math.floor(Date.now()/1000);
+            var now = Math.floor(Date.now() / 1000);
             jwtToken.iat = now;
             // Default maxTokenAge is 15m
             jwtToken.exp = now + (self.config.maxTokenAge() / 1000);
@@ -291,7 +290,7 @@ proto.authenticate = function(){
                 }
 
                 // Then, let's look up the client's oauthSecret so we can verify the request
-                self.loadClientInfo(issuer).then(function(clientInfo){
+                self.loadClientInfo(issuer).then(function (clientInfo) {
                     // verify the signed request
                     if (clientInfo === null) {
                         return send(400, "Request can't be verified without an OAuth secret");
@@ -300,11 +299,11 @@ proto.authenticate = function(){
 
                     // JWT expiry can be overriden using the `validityInMinutes` config.
                     // If not set, will use `exp` provided by HC server (default is 1 hour)
-                    var now = Math.floor(Date.now()/1000);
+                    var now = Math.floor(Date.now() / 1000);
                     if (self.config.maxTokenAge()) {
                         var issuedAt = verifiedClaims.iat;
                         var expiresInSecs = self.config.maxTokenAge() / 1000;
-                        if(issuedAt && now >= (issuedAt + expiresInSecs)){
+                        if (issuedAt && now >= (issuedAt + expiresInSecs)) {
                             send(401, 'Authentication request has expired.');
                             return;
                         }
@@ -318,19 +317,19 @@ proto.authenticate = function(){
                     }
 
                     success(verifiedClaims, clientInfo);
-                }, function(err) {
+                }, function (err) {
                     return send(400, err.message);
                 });
-            } catch(e){
+            } catch (e) {
                 return send(400, e.message);
             }
         } else if (req.body.oauth_client_id) {
-            self.settings.get('clientInfo', req.body.oauth_client_id).then(function(d){
+            self.settings.get('clientInfo', req.body.oauth_client_id).then(function (d) {
                 try {
                     req.clientInfo = d;
                     req.context = req.body;
                     next();
-                } catch(e){
+                } catch (e) {
                     return send(400, e.message);
                 }
             });
@@ -340,6 +339,6 @@ proto.authenticate = function(){
     }
 }
 
-module.exports = function(addon, app){
+module.exports = function (addon, app) {
     return new HipChat(addon, app);
 }
