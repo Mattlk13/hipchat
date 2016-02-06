@@ -194,7 +194,7 @@ proto.middleware = function () {
 
     var addon = this;
     return function (req, res, next) {
-        var hostUrl = req.params.xdmhost;
+        var hostUrl = _.get(req.params, 'xdmhost','');
         var params;
 
         if (hostUrl) {
