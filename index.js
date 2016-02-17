@@ -328,6 +328,11 @@ proto.authenticate = function () {
                 try {
                     req.clientInfo = d;
                     req.context = req.body;
+                    req.identity = _.assign({}, {
+                        groupId: clientInfo.groupId,
+                        roomId: req.context.room_id,
+                        userId: _.get(req.context,'item.message.from.id', null)
+                    });
                     next();
                 } catch (e) {
                     return send(400, e.message);
