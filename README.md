@@ -1,6 +1,6 @@
 # atlassian-connect-express-hipchat: Node.js module for Express based HipChat Connect Add-ons
 
-Atlassian-Connect-Express-hipchat (ACE) is a NPM module to help developers build HipChat add-ons.
+Atlassian-Connect-Express-hipchat (ACE) is a NPM module to help developers build HipChat add-ons using [HipChat Connect](https://developer.atlassian.com/hipchat/getting-started).
 Building a HipChat add-on with ACE is relatively simple, as it generates most of the plumbing for you, using Node.js
 and Express as the add-on server.
 
@@ -15,7 +15,7 @@ The following tutorial explains what you need to do to build a HipChat Connect a
 ## Getting Help or Support
 
 You can get help by emailing <integrations@hipchat.com> or [report bugs](https://bitbucket.org/hipchat/atlassian-connect-express-hipchat/issues?status=new&status=open).
-If you want to learn more about HipChat Connect, you can visit <https://www.hipchat.com/docs/apiv2/addons>.
+If you want to learn more about HipChat Connect, you can visit <https://developer.atlassian.com/hipchat/getting-started>.
 
 ## Contributing
 
