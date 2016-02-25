@@ -270,7 +270,7 @@ proto.authenticate = function () {
             req.identity = _.assign({}, {
                 groupId: clientInfo.groupId,
                 roomId: req.context.room_id,
-                userId: jwtToken.sub
+                userId: parseInt(jwtToken.sub)
             });
 
             next();
@@ -329,8 +329,8 @@ proto.authenticate = function () {
                     req.clientInfo = d;
                     req.context = req.body;
                     req.identity = _.assign({}, {
-                        groupId: clientInfo.groupId,
-                        roomId: req.context.room_id,
+                        groupId: req.clientInfo.groupId,
+                        roomId: _.get(req.context, 'item.room.id', req.clientInfo.roomId),
                         userId: _.get(req.context,'item.message.from.id', null)
                     });
                     next();
