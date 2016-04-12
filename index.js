@@ -155,21 +155,21 @@ proto._configure = function () {
                                     self.settings.set('clientInfo', clientInfo, clientKey).then(function (data) {
                                         self.logger.info("Saved tenant details for " + clientKey + " to database\n" + util.inspect(data));
                                         self.emit('host_settings_saved', clientKey, data);
-                                        res.send(204);
+                                        res.sendStatus(204);
                                     }, function (err) {
-                                        res.send(500, 'Could not lookup stored client data for ' + clientKey + ': ' + err);
+                                        res.status(500).send('Could not lookup stored client data for ' + clientKey + ': ' + err);
                                     });
                                 })
                                 .then(null, function (err) {
-                                    res.send(500, err);
+                                    res.status(500).send(err);
                                 });
                         })
                         .then(null, function (err) {
-                            res.send(500, err);
+                            res.status(500).send(err);
                         }
                             );
                 } catch (e) {
-                    res.send(500, e);
+                    res.status(500).send(e);
                 }
             }
             );
@@ -182,9 +182,9 @@ proto._configure = function () {
         function (req, res) {
             try {
                 self.emit('uninstalled', req.params.oauthId);
-                res.send(204);
+                res.sendStatus(204);
             } catch (e) {
-                res.send(500, e);
+                res.sendStatus(500, e);
             }
         }
         );
@@ -248,7 +248,7 @@ proto.authenticate = function () {
     return function (req, res, next) {
         function send(code, msg) {
             self.logger.error('JWT verification error:', code, msg);
-            res.send(code, msg);
+            res.status(code).send(msg);
         }
 
         function success(jwtToken, clientInfo) {
