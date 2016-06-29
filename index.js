@@ -180,7 +180,6 @@ proto._configure = function () {
                             res.status(500).send(err);
                         });
                 } catch (e) {
-                    self.logger.error('shhite');
                     res.status(500).send(e);
                 }
             }
