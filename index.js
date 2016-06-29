@@ -49,11 +49,11 @@ proto.getAccessToken = function (clientInfo, scopes) {
                     pass: clientInfo.oauthSecret
                 }
             }, function (err, res, token) {
-                if (!err) {
+                if (!err && res.statusCode === 200) {
                     token.created = new Date().getTime() / 1000;
                     resolve(token);
                 } else {
-                    reject(err);
+                    reject(res.body.error);
                 }
             });
         });
@@ -115,7 +115,7 @@ proto._configure = function () {
                         reject("The capabilities URL " + url + " doesn't match the resource's self link " + data.links.self);
                     }
                 } else {
-                    reject(err);
+                    reject(new Error('Failed to create access token'));
                 }
             });
         });
@@ -146,29 +146,41 @@ proto._configure = function () {
                                 roomId: req.body.roomId
                             };
                             var clientKey = clientInfo.clientKey;
-                            self.getAccessToken(clientInfo)
-                                .then(function (tokenObj) {
-                                    clientInfo.groupId = tokenObj.group_id;
-                                    clientInfo.groupName = tokenObj.group_name;
-                                    self.emit('installed', clientKey, clientInfo, req);
-                                    self.emit('plugin_enabled', clientKey, clientInfo, req);
-                                    self.settings.set('clientInfo', clientInfo, clientKey).then(function (data) {
-                                        self.logger.info("Saved tenant details for " + clientKey + " to database\n" + util.inspect(data));
-                                        self.emit('host_settings_saved', clientKey, data);
-                                        res.sendStatus(204);
-                                    }, function (err) {
-                                        res.status(500).send('Could not lookup stored client data for ' + clientKey + ': ' + err);
+                            self.settings.get('clientInfo', clientKey).then(function (tenant) {
+                                if (!tenant) {
+                                    return;
+                                } else {
+                                    throw new Error('Tenant already exists');
+                                }
+                            }).then(function () {
+                                self.getAccessToken(clientInfo)
+                                    .then(function (tokenObj) {
+                                        clientInfo.groupId = tokenObj.group_id;
+                                        clientInfo.groupName = tokenObj.group_name;
+                                        self.emit('installed', clientKey, clientInfo, req);
+                                        self.emit('plugin_enabled', clientKey, clientInfo, req);
+                                        self.settings.set('clientInfo', clientInfo, clientKey).then(function (data) {
+                                            self.logger.info("Saved tenant details for " + clientKey + " to database\n" + util.inspect(data));
+                                            self.emit('host_settings_saved', clientKey, data);
+                                            res.sendStatus(204);
+                                        }, function (err) {
+                                            res.status(500).send('Could not lookup stored client data for ' + clientKey + ': ' + err);
+                                        });
+                                    })
+                                    .catch(function (err) {
+                                        self.logger.error('Failed to generate access token');
+                                        res.status(500).json(JSON.stringify(err, ["message", "arguments", "type", "name"]));
                                     });
-                                })
-                                .then(null, function (err) {
-                                    res.status(500).send(err);
-                                });
+                            }).catch(function (err) {
+                                self.logger.error('Attempt to install a tenant key that already exists');
+                                res.status(409).json(JSON.stringify(err, ["message", "arguments", "type", "name"]));
+                            });
                         })
                         .then(null, function (err) {
                             res.status(500).send(err);
-                        }
-                            );
+                        });
                 } catch (e) {
+                    self.logger.error('shhite');
                     res.status(500).send(e);
                 }
             }
