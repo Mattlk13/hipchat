@@ -147,7 +147,7 @@ proto._configure = function () {
                             };
                             var clientKey = clientInfo.clientKey;
                             self.settings.get('clientInfo', clientKey).then(function (tenant) {
-                                if (!tenant) {
+                                if (!tenant || tenant.oauthSecret === clientInfo.oauthSecret) {
                                     return;
                                 } else {
                                     throw new Error('Tenant already exists');
