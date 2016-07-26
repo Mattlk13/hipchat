@@ -160,7 +160,7 @@ proto._configure = function () {
                                         self.emit('installed', clientKey, clientInfo, req);
                                         self.emit('plugin_enabled', clientKey, clientInfo, req);
                                         self.settings.set('clientInfo', clientInfo, clientKey).then(function (data) {
-                                            self.logger.info("Saved tenant details for " + clientKey + " to database\n" + util.inspect(data));
+                                            self.logger.info("Saved tenant details for " + clientKey + " to database");
                                             self.emit('host_settings_saved', clientKey, data);
                                             res.sendStatus(204);
                                         }, function (err) {
