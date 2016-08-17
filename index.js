@@ -164,23 +164,26 @@ proto._configure = function () {
                                             self.emit('host_settings_saved', clientKey, data);
                                             res.sendStatus(204);
                                         }, function (err) {
+                                            self.logger.err(err);
                                             res.status(500).send('Could not lookup stored client data for ' + clientKey + ': ' + err);
                                         });
                                     })
                                     .catch(function (err) {
-                                        self.logger.error('Failed to generate access token');
+                                        self.logger.error('Failed to generate access token', err);
                                         res.status(500).json(JSON.stringify(err, ["message", "arguments", "type", "name"]));
                                     });
                             }).catch(function (err) {
-                                self.logger.error('Attempt to install a tenant key that already exists');
+                                self.logger.error('Attempt to install a tenant key that already exists', err);
                                 res.status(409).json(JSON.stringify(err, ["message", "arguments", "type", "name"]));
                             });
                         })
                         .then(null, function (err) {
+                            self.logger.error(err);
                             res.status(500).send(err);
                         });
-                } catch (e) {
-                    res.status(500).send(e);
+                } catch (err) {
+                    self.logger.error(err);
+                    res.status(500).send(err);
                 }
             }
             );
@@ -194,8 +197,9 @@ proto._configure = function () {
             try {
                 self.emit('uninstalled', req.params.oauthId);
                 res.sendStatus(204);
-            } catch (e) {
-                res.sendStatus(500, e);
+            } catch (err) {
+                self.logger.error(err);
+                res.sendStatus(500, err);
             }
         }
         );
