@@ -91,7 +91,7 @@ proto.getAccessToken = function (clientInfo, scopes) {
     });
 };
 
-proto._configure = function () {
+proto._configure = function (callback) {
     var self = this;
     var baseUrl = urls.parse(self.config.localBaseUrl());
     var basePath = baseUrl.path && baseUrl.path.length > 1 ? baseUrl.path : '';
@@ -356,6 +356,9 @@ proto.authenticate = function () {
         } else {
             return send(400, "Request not signed and therefore can't be verified");
         }
+    }
+    if (callback) {
+        callback();
     }
 }
 
