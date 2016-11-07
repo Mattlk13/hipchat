@@ -202,7 +202,11 @@ proto._configure = function (callback) {
                 res.sendStatus(500, err);
             }
         }
-        );
+    );
+
+    if (callback) {
+        callback();
+    }
 }
 
 proto.middleware = function () {
@@ -356,9 +360,6 @@ proto.authenticate = function () {
         } else {
             return send(400, "Request not signed and therefore can't be verified");
         }
-    }
-    if (callback) {
-        callback();
     }
 }
 
