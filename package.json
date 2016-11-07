@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/hipchat/atlassian-connect-express-hipchat"
+    "url": "https://bitbucket.org/atlassianlabs/atlassian-connect-express-hipchat"
   },
   "keywords": [
     "atlassian",
